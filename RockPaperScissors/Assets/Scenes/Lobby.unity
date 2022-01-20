@@ -603,7 +603,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Player 1 Name
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: de6fc02c3f514224ca700f6e2a555fb2, type: 2}
   m_sharedMaterial: {fileID: 6455327506536482742, guid: de6fc02c3f514224ca700f6e2a555fb2, type: 2}
@@ -1161,7 +1161,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerName: {fileID: 0}
   gameCode: {fileID: 1472025541}
+  enterGameCode: {fileID: 0}
   p1Name: {fileID: 292276703}
+  p2Name: {fileID: 0}
 --- !u!4 &784114791
 Transform:
   m_ObjectHideFlags: 0
@@ -1553,7 +1555,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Player 2 Name
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: de6fc02c3f514224ca700f6e2a555fb2, type: 2}
   m_sharedMaterial: {fileID: 6455327506536482742, guid: de6fc02c3f514224ca700f6e2a555fb2, type: 2}

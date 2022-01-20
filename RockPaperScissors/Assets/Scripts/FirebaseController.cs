@@ -9,7 +9,7 @@ public class FirebaseController : MonoBehaviour
     public static Player player1;
     public static Player player2;
 
-    public bool isKeyCorrect;
+    public static bool isKeyCorrect;
 
     private static DatabaseReference databaseReference;
 
@@ -56,12 +56,27 @@ public class FirebaseController : MonoBehaviour
                 if (snapshot.Value != null)
                 {
                     Debug.Log("Correct Key");
+                    isKeyCorrect = true;
                 }
                 else
                 {
                     Debug.Log("Incorrect Key");
+                    isKeyCorrect = false;
                 }
             }
         });
+    }
+
+    public static IEnumerator AddSecondPlayerFB()
+    {
+        new WaitForSeconds(1f);
+
+        string p2Json = JsonUtility.ToJson(player2);
+
+        yield return databaseReference.Child("Games").Child(key).Child("Player 2").SetRawJsonValueAsync(p2Json);
+
+        Debug.Log("Player 2 added to Firebase");
+
+        GameManager.LoadScene("Lobby");
     }
 }

@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TMP_InputField gameCode;
     [SerializeField] private TMP_InputField enterGameCode;
     [SerializeField] private TMP_Text p1Name;
+    [SerializeField] private TMP_Text p2Name;
 
     private void Awake()
     {
@@ -17,6 +18,11 @@ public class GameManager : MonoBehaviour
         {
             gameCode.text = FirebaseController.key;
             p1Name.text = FirebaseController.player1.Name;
+
+            if (FirebaseController.player2.Name != "")
+            {
+                p2Name.text = FirebaseController.player2.Name;
+            }
         }
     }
 
@@ -58,6 +64,8 @@ public class GameManager : MonoBehaviour
     {
         if (playerName.text != "")
         {
+            FirebaseController.player2.Name = playerName.text;
+
             LoadScene("Join");
         }
     }
@@ -67,6 +75,11 @@ public class GameManager : MonoBehaviour
         if (enterGameCode.text != "")
         {
             StartCoroutine(FirebaseController.CheckKey(enterGameCode.text));
+
+            if (FirebaseController.isKeyCorrect == true)
+            {
+                StartCoroutine(FirebaseController.AddSecondPlayerFB());
+            }
         }
     }
 }
