@@ -9,6 +9,12 @@ public class FirebaseController : MonoBehaviour
     public static Player player1 = new Player();
     public static Player player2 = new Player();
 
+    public static bool isPlayer1 = false;
+    public static bool isPlayer2 = false;
+
+    public static bool player1Ready = false;
+    public static bool player2Ready = false;
+
     public static bool isKeyCorrect;
 
     private static DatabaseReference databaseReference;
@@ -32,15 +38,21 @@ public class FirebaseController : MonoBehaviour
         key = databaseReference.Child("Games").Push().Key;
 
         player1.Name = p1Name;
+        player1.ID = 1;
         string p1Json = JsonUtility.ToJson(player1);
 
-        yield return databaseReference.Child("Games").Child(key).Child("Player 1").SetRawJsonValueAsync(p1Json);
+        yield return databaseReference.Child("Games").Child(key).Child("Player_1").SetRawJsonValueAsync(p1Json);
 
         databaseReference.Child("Games").Child(key).ValueChanged += HandlePlayerChanged;
 
         Debug.Log("Player 1 added to Firebase");
 
         GameManager.LoadScene("Lobby");
+
+        isPlayer1 = true;
+
+        Debug.Log("This is P1: " + isPlayer1);
+        Debug.Log("This is P2: " + isPlayer2);
     }
 
     public static void HandlePlayerChanged(object sender, ValueChangedEventArgs args)
@@ -56,7 +68,7 @@ public class FirebaseController : MonoBehaviour
 
             foreach (var player in args.Snapshot.Children)
             {
-                if (player.Key == "Player 1")
+                if (player.Key == "Player_1")
                 {
                     foreach (var child in player.Children)
                     {
@@ -67,7 +79,7 @@ public class FirebaseController : MonoBehaviour
                     }
 
                 }
-                else if (player.Key == "Player 2")
+                else if (player.Key == "Player_2")
                 {
                     foreach (var child in player.Children)
                     {
@@ -80,6 +92,9 @@ public class FirebaseController : MonoBehaviour
             }
 
             Debug.Log("Player Joined");
+
+            Debug.Log("This is P1: " + isPlayer1);
+            Debug.Log("This is P2: " + isPlayer2);
         }
     }
 
@@ -108,14 +123,75 @@ public class FirebaseController : MonoBehaviour
 
     public static IEnumerator AddSecondPlayerFB(string key)
     {
+        player2.ID = 2;
         string p2Json = JsonUtility.ToJson(player2);
 
-        yield return databaseReference.Child("Games").Child(key).Child("Player 2").SetRawJsonValueAsync(p2Json);
+        yield return databaseReference.Child("Games").Child(key).Child("Player_2").SetRawJsonValueAsync(p2Json);
 
         databaseReference.Child("Games").Child(key).ValueChanged += HandlePlayerChanged;
 
         Debug.Log("Player 2 added to Firebase");
 
         GameManager.LoadScene("Lobby");
+
+        isPlayer2 = true;
+
+        Debug.Log("This is P1: " + isPlayer1);
+        Debug.Log("This is P2: " + isPlayer2);
+    }
+
+    public static void UpdatePlayerStatusFB(Player player, bool playerStatus)
+    {
+        Debug.Log("Updating Player Status");
+
+        Dictionary<string, System.Object> result = new Dictionary<string, System.Object>();
+
+        result["Games/" + key + "/Player_" + player.ID + "/isReady"] = playerStatus;
+
+        databaseReference.UpdateChildrenAsync(result);
+        databaseReference.Child("Games").Child(key).ValueChanged += HandleStatusChanged;
+
+        Debug.Log("Player Status Updated");
+
+        //CheckStatus();
+    }
+
+    public static void HandleStatusChanged(object sender, ValueChangedEventArgs args)
+    {
+        if (args.DatabaseError != null)
+        {
+            Debug.LogError(args.DatabaseError.Message);
+            return;
+        }
+        else
+        {
+            Debug.Log("Status Changed");
+            Dictionary<string, System.Object> result = new Dictionary<string, System.Object>();
+
+            foreach (var player in args.Snapshot.Children)
+            {
+                switch (player.Key)
+                {
+                    case "Player_1":
+                        player1Ready = (bool)player.Child("isReady").Value;
+                        break;
+                    case "Player_2":
+                        player2Ready = (bool)player.Child("isReady").Value;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            Debug.Log("Status Updated");
+        }
+    }
+
+    public static void CheckStatus()
+    {
+        if (player1Ready == true && player2Ready == true)
+        {
+            GameManager.LoadScene("Game");
+        }
     }
 }

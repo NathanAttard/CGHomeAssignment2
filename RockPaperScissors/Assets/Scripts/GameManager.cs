@@ -11,23 +11,14 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TMP_InputField enterGameCode;
     [SerializeField] private TMP_Text p1Name;
     [SerializeField] private TMP_Text p2Name;
+    [SerializeField] private GameObject waitingForOpponent;
 
     private void Awake()
     {
-        //if (SceneManager.GetActiveScene().name == "Lobby")
-        //{
-        //    gameCode.text = FirebaseController.key;
-        //    p1Name.text = FirebaseController.player1.Name;
-
-        //    if (FirebaseController.player2.Name != "")
-        //    {
-        //        p2Name.text = FirebaseController.player2.Name;
-        //    }
-        //}
-
         switch (SceneManager.GetActiveScene().name)
         {
             case "Lobby":
+                waitingForOpponent.SetActive(false);
                 gameCode.text = FirebaseController.key;
                 p1Name.text = FirebaseController.player1.Name;
 
@@ -54,6 +45,7 @@ public class GameManager : MonoBehaviour
         {
             case "Lobby":
                 UpdateLobbyUI();
+                FirebaseController.CheckStatus();
                 break;
             default:
                 break;
@@ -123,6 +115,30 @@ public class GameManager : MonoBehaviour
         else if (p2Name.text == "")
         {
             p2Name.text = FirebaseController.player2.Name;
+        }
+    }
+
+    public void StartGame()
+    {
+        waitingForOpponent.SetActive(true);
+
+        if (FirebaseController.isPlayer1 == true)
+        {
+            FirebaseController.player1Ready = true;
+
+            FirebaseController.UpdatePlayerStatusFB(FirebaseController.player1, FirebaseController.player1Ready);
+
+            Debug.Log("Player 1 Ready? " + FirebaseController.player1Ready);
+            Debug.Log("Player 2 Ready? " + FirebaseController.player2Ready);
+        }
+        else if (FirebaseController.isPlayer2 == true)
+        {
+            FirebaseController.player2Ready = true;
+
+            FirebaseController.UpdatePlayerStatusFB(FirebaseController.player2, FirebaseController.player2Ready);
+
+            Debug.Log("Player 1 Ready? " + FirebaseController.player1Ready);
+            Debug.Log("Player 2 Ready? " + FirebaseController.player2Ready);
         }
     }
 }
