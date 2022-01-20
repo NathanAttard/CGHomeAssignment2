@@ -24,6 +24,9 @@
 /[Aa]ssets/[Gg]oogle-services.json
 /[Aa]ssets/[Gg]oogle-services.json
 
+# Excluding Imported Assets
+/[Aa]ssets/Fantasy*Wooden*GUI*Free/
+/[Aa]ssets/TextMesh*Pro/
 
 # Excluding MacOS files
 .DS_Store
