@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private TMP_InputField playerName;
     [SerializeField] private TMP_InputField gameCode;
+    [SerializeField] private TMP_InputField enterGameCode;
     [SerializeField] private TMP_Text p1Name;
 
     private void Awake()
@@ -50,6 +51,22 @@ public class GameManager : MonoBehaviour
         if (playerName.text != "")
         {
             StartCoroutine(FirebaseController.CreateGameFB(playerName.text));
+        }
+    }
+
+    public void EnterCode()
+    {
+        if (playerName.text != "")
+        {
+            LoadScene("Join");
+        }
+    }
+
+    public void JoinGame()
+    {
+        if (enterGameCode.text != "")
+        {
+            StartCoroutine(FirebaseController.CheckKey(enterGameCode.text));
         }
     }
 }
