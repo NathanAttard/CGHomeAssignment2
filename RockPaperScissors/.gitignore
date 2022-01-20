@@ -24,9 +24,10 @@
 /[Aa]ssets/[Gg]oogle-services.json
 /[Aa]ssets/[Gg]oogle-services.json
 
-# Excluding Imported Assets
+# Excluding Imported Assets + ParrelSync
 /[Aa]ssets/Fantasy*Wooden*GUI*Free/
 /[Aa]ssets/TextMesh*Pro/
+/[Aa]ssets/ParrelSync/
 
 # Excluding MacOS files
 .DS_Store

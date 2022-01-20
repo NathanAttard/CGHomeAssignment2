@@ -14,15 +14,30 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        if (SceneManager.GetActiveScene().name == "Lobby")
-        {
-            gameCode.text = FirebaseController.key;
-            p1Name.text = FirebaseController.player1.Name;
+        //if (SceneManager.GetActiveScene().name == "Lobby")
+        //{
+        //    gameCode.text = FirebaseController.key;
+        //    p1Name.text = FirebaseController.player1.Name;
 
-            if (FirebaseController.player2.Name != "")
-            {
-                p2Name.text = FirebaseController.player2.Name;
-            }
+        //    if (FirebaseController.player2.Name != "")
+        //    {
+        //        p2Name.text = FirebaseController.player2.Name;
+        //    }
+        //}
+
+        switch (SceneManager.GetActiveScene().name)
+        {
+            case "Lobby":
+                gameCode.text = FirebaseController.key;
+                p1Name.text = FirebaseController.player1.Name;
+
+                if (FirebaseController.player2.Name != "")
+                {
+                    p2Name.text = FirebaseController.player2.Name;
+                }
+                break;
+            default:
+                break;
         }
     }
 
@@ -35,7 +50,14 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        switch (SceneManager.GetActiveScene().name)
+        {
+            case "Lobby":
+                UpdateLobbyUI();
+                break;
+            default:
+                break;
+        }
     }
 
     public static void LoadScene(string scene)
@@ -78,8 +100,29 @@ public class GameManager : MonoBehaviour
 
             if (FirebaseController.isKeyCorrect == true)
             {
-                StartCoroutine(FirebaseController.AddSecondPlayerFB());
+                StartCoroutine(FirebaseController.AddSecondPlayerFB(enterGameCode.text));
             }
+
+            FirebaseController.key = enterGameCode.text;
+        }
+    }
+
+    public void UpdateLobbyUI()
+    {
+        if (FirebaseController.player1.Name != "" && FirebaseController.player2.Name != "" && FirebaseController.key != "")
+        {
+            gameCode.text = FirebaseController.key;
+            p1Name.text = FirebaseController.player1.Name;
+            p2Name.text = FirebaseController.player2.Name;
+        }
+
+        if (p1Name.text == "")
+        {
+            p1Name.text = FirebaseController.player1.Name;
+        }
+        else if (p2Name.text == "")
+        {
+            p2Name.text = FirebaseController.player2.Name;
         }
     }
 }
