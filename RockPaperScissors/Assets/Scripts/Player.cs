@@ -6,7 +6,8 @@ public class Player : MonoBehaviour
 {
     public string Name;
     public int ID;
+    public string Choice;
     public int Moves;
     public int Wins;
-    public bool isReady;
+    public bool IsReady;
 }

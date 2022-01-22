@@ -3,16 +3,25 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private TMP_InputField playerName;
+    [Header("Game Code")]
     [SerializeField] private TMP_InputField gameCode;
     [SerializeField] private TMP_InputField enterGameCode;
-    [SerializeField] private TMP_Text p1Name;
-    [SerializeField] private TMP_Text p2Name;
     [SerializeField] private GameObject waitingForOpponent;
 
+    [Header("Players")]
+    [SerializeField] private TMP_InputField playerName;
+    [SerializeField] private TMP_Text p1Name;
+    [SerializeField] private TMP_Text p2Name;
+
+    [Header("Buttons")]
+    [SerializeField] private GameObject rockBtn;
+    [SerializeField] private GameObject paperBtn;
+    [SerializeField] private GameObject scissorsBtn;
+    
     private void Awake()
     {
         switch (SceneManager.GetActiveScene().name)
@@ -46,6 +55,9 @@ public class GameManager : MonoBehaviour
             case "Lobby":
                 UpdateLobbyUI();
                 FirebaseController.CheckStatus();
+                break;
+            case "Game":
+                FirebaseController.CheckChoices();
                 break;
             default:
                 break;
@@ -139,6 +151,49 @@ public class GameManager : MonoBehaviour
 
             Debug.Log("Player 1 Ready? " + FirebaseController.player1Ready);
             Debug.Log("Player 2 Ready? " + FirebaseController.player2Ready);
+        }
+    }
+
+    public void OptionChosen(string option)
+    {
+        Debug.Log("Option Chosen: " + option);
+
+        switch (option)
+        {
+            case "Rock":
+                rockBtn.GetComponent<Button>().enabled = false;
+                paperBtn.GetComponent<Button>().interactable = false;
+                scissorsBtn.GetComponent<Button>().interactable = false;
+                break;
+            case "Paper":
+                rockBtn.GetComponent<Button>().interactable = false;
+                paperBtn.GetComponent<Button>().enabled = false;
+                scissorsBtn.GetComponent<Button>().interactable = false;
+                break;
+            case "Scissors":
+                rockBtn.GetComponent<Button>().interactable = false;
+                paperBtn.GetComponent<Button>().interactable = false;
+                scissorsBtn.GetComponent<Button>().enabled = false;
+                break;
+        }
+
+        if (FirebaseController.isPlayer1 == true)
+        {
+            FirebaseController.player1Choice = option;
+
+            FirebaseController.UpdatePlayerChoiceFB(FirebaseController.player1, FirebaseController.player1Choice);
+
+            Debug.Log("Player 1 Choice " + FirebaseController.player1Choice);
+            Debug.Log("Player 2 Choice " + FirebaseController.player2Choice);
+        }
+        else if (FirebaseController.isPlayer2 == true)
+        {
+            FirebaseController.player2Choice = option;
+
+            FirebaseController.UpdatePlayerChoiceFB(FirebaseController.player2, FirebaseController.player2Choice);
+
+            Debug.Log("Player 1 Choice " + FirebaseController.player1Choice);
+            Debug.Log("Player 2 Choice " + FirebaseController.player2Choice);
         }
     }
 }

@@ -12,10 +12,13 @@ public class FirebaseController : MonoBehaviour
     public static bool isPlayer1 = false;
     public static bool isPlayer2 = false;
 
+    public static bool isKeyCorrect;
+
     public static bool player1Ready = false;
     public static bool player2Ready = false;
 
-    public static bool isKeyCorrect;
+    public static string player1Choice;    
+    public static string player2Choice;    
 
     private static DatabaseReference databaseReference;
 
@@ -152,8 +155,6 @@ public class FirebaseController : MonoBehaviour
         databaseReference.Child("Games").Child(key).ValueChanged += HandleStatusChanged;
 
         Debug.Log("Player Status Updated");
-
-        //CheckStatus();
     }
 
     public static void HandleStatusChanged(object sender, ValueChangedEventArgs args)
@@ -193,5 +194,56 @@ public class FirebaseController : MonoBehaviour
         {
             GameManager.LoadScene("Game");
         }
+    }
+
+    public static void UpdatePlayerChoiceFB(Player player, string playerChoice)
+    {
+        Debug.Log("Updating Player Choice");
+
+        Dictionary<string, System.Object> result = new Dictionary<string, System.Object>();
+
+        result["Games/" + key + "/Player_" + player.ID + "/Choice"] = playerChoice;
+
+        databaseReference.UpdateChildrenAsync(result);
+        databaseReference.Child("Games").Child(key).ValueChanged += HandleChoiceChanged;
+
+        Debug.Log("Player Choice Updated");
+    }
+
+    public static void HandleChoiceChanged(object sender, ValueChangedEventArgs args)
+    {
+        if (args.DatabaseError != null)
+        {
+            Debug.LogError(args.DatabaseError.Message);
+            return;
+        }
+        else
+        {
+            Debug.Log("Choice Changed");
+            Dictionary<string, System.Object> result = new Dictionary<string, System.Object>();
+
+            foreach (var player in args.Snapshot.Children)
+            {
+                switch (player.Key)
+                {
+                    case "Player_1":
+                        player1Choice = player.Child("Choice").Value.ToString();
+                        break;
+                    case "Player_2":
+                        player2Choice = player.Child("Choice").Value.ToString();
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            Debug.Log("Choice Updated");
+        }
+    }
+
+    public static void CheckChoices()
+    {
+        Debug.Log("Player 1 Choice " + FirebaseController.player1Choice);
+        Debug.Log("Player 2 Choice " + FirebaseController.player2Choice);
     }
 }
