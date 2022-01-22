@@ -17,8 +17,8 @@ public class FirebaseController : MonoBehaviour
     public static bool player1Ready = false;
     public static bool player2Ready = false;
 
-    public static string player1Choice;    
-    public static string player2Choice;    
+    public static string player1Choice = "";    
+    public static string player2Choice = "";    
 
     private static DatabaseReference databaseReference;
 

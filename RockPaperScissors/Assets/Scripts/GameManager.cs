@@ -10,17 +10,26 @@ public class GameManager : MonoBehaviour
     [Header("Game Code")]
     [SerializeField] private TMP_InputField gameCode;
     [SerializeField] private TMP_InputField enterGameCode;
-    [SerializeField] private GameObject waitingForOpponent;
 
-    [Header("Players")]
+    [Header("Lobby")]
     [SerializeField] private TMP_InputField playerName;
     [SerializeField] private TMP_Text p1Name;
     [SerializeField] private TMP_Text p2Name;
+    [SerializeField] private GameObject waitingForOpponent;
+
+    [Header("Game UI")]
+    [SerializeField] private TMP_Text player1Name;
+    [SerializeField] private TMP_Text player2Name;
+    [SerializeField] private TMP_Text timer;
+    [SerializeField] private GameObject waitingForChoice;
 
     [Header("Buttons")]
     [SerializeField] private GameObject rockBtn;
     [SerializeField] private GameObject paperBtn;
     [SerializeField] private GameObject scissorsBtn;
+
+    float roundTime = 0.10f;
+    float currentTime;
     
     private void Awake()
     {
@@ -36,6 +45,11 @@ public class GameManager : MonoBehaviour
                     p2Name.text = FirebaseController.player2.Name;
                 }
                 break;
+            case "Game":
+                player1Name.text = FirebaseController.player1.Name;
+                player2Name.text = FirebaseController.player2.Name;
+                waitingForChoice.SetActive(false);
+                break;
             default:
                 break;
         }
@@ -44,7 +58,8 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        currentTime = roundTime;
+        StartCoroutine(RoundTime());
     }
 
     // Update is called once per frame
@@ -154,6 +169,20 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public IEnumerator RoundTime()
+    {
+        while (true)
+        {
+            currentTime = currentTime - 0.01f;
+            currentTime = (float)Mathf.Round(currentTime * 100f) / 100f;
+            string time = currentTime.ToString("00.00").Replace('.', ':');
+
+            timer.text = time;
+
+            yield return new WaitForSeconds(1f);
+        }
+    }
+
     public void OptionChosen(string option)
     {
         Debug.Log("Option Chosen: " + option);
@@ -181,6 +210,13 @@ public class GameManager : MonoBehaviour
         {
             FirebaseController.player1Choice = option;
 
+            Debug.Log("PLAYER 2 CHOICE: " + FirebaseController.player2Choice);
+
+            if (FirebaseController.player2Choice == "")
+            {
+                waitingForChoice.SetActive(true);
+            }
+
             FirebaseController.UpdatePlayerChoiceFB(FirebaseController.player1, FirebaseController.player1Choice);
 
             Debug.Log("Player 1 Choice " + FirebaseController.player1Choice);
@@ -189,6 +225,11 @@ public class GameManager : MonoBehaviour
         else if (FirebaseController.isPlayer2 == true)
         {
             FirebaseController.player2Choice = option;
+
+            if (FirebaseController.player1Choice == "")
+            {
+                waitingForChoice.SetActive(true);
+            }
 
             FirebaseController.UpdatePlayerChoiceFB(FirebaseController.player2, FirebaseController.player2Choice);
 
