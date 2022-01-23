@@ -22,12 +22,17 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TMP_Text player2Name;
     [SerializeField] private TMP_Text timer;
     [SerializeField] private GameObject waitingForChoice;
+    [SerializeField] private TMP_Text p1Choice;
+    [SerializeField] private TMP_Text p2Choice;
+    [SerializeField] private TMP_Text p1Win;
+    [SerializeField] private TMP_Text p2Win;
 
     [Header("Buttons")]
     [SerializeField] private GameObject rockBtn;
     [SerializeField] private GameObject paperBtn;
     [SerializeField] private GameObject scissorsBtn;
 
+    Coroutine roundTimer;
     float roundTime = 0.10f;
     float currentTime;
     
@@ -48,6 +53,8 @@ public class GameManager : MonoBehaviour
             case "Game":
                 player1Name.text = FirebaseController.player1.Name;
                 player2Name.text = FirebaseController.player2.Name;
+                p1Win.text = FirebaseController.player1.Wins.ToString();
+                p2Win.text = FirebaseController.player2.Wins.ToString();
                 waitingForChoice.SetActive(false);
                 break;
             default:
@@ -59,7 +66,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         currentTime = roundTime;
-        StartCoroutine(RoundTime());
+        roundTimer = StartCoroutine(RoundTime());
     }
 
     // Update is called once per frame
@@ -73,6 +80,7 @@ public class GameManager : MonoBehaviour
                 break;
             case "Game":
                 FirebaseController.CheckChoices();
+                DisplayResults();
                 break;
             default:
                 break;
@@ -236,5 +244,108 @@ public class GameManager : MonoBehaviour
             Debug.Log("Player 1 Choice " + FirebaseController.player1Choice);
             Debug.Log("Player 2 Choice " + FirebaseController.player2Choice);
         }
+    }
+
+    public void DisplayResults()
+    {
+        if (FirebaseController.player1Choice != "" && FirebaseController.player2Choice != "" && currentTime > 0f)
+        {
+            waitingForChoice.SetActive(false);
+            StopCoroutine(roundTimer);
+            Win(FirebaseController.player1Choice, FirebaseController.player2Choice);
+        }
+        else if (currentTime <= 0f)
+        {
+            if (FirebaseController.player1Choice == "")
+            {
+                rockBtn.GetComponent<Button>().interactable = false;
+                paperBtn.GetComponent<Button>().interactable = false;
+                scissorsBtn.GetComponent<Button>().interactable = false;
+                FirebaseController.UpdatePlayerChoiceFB(FirebaseController.player1, "None");
+            }
+            else if (FirebaseController.player2Choice == "")
+            {
+                rockBtn.GetComponent<Button>().interactable = false;
+                paperBtn.GetComponent<Button>().interactable = false;
+                scissorsBtn.GetComponent<Button>().interactable = false;
+                FirebaseController.UpdatePlayerChoiceFB(FirebaseController.player2, "None");
+            }
+
+            waitingForChoice.SetActive(false);
+            StopCoroutine(roundTimer);
+            Win(FirebaseController.player1Choice, FirebaseController.player2Choice);
+        }
+
+        p1Choice.text = FirebaseController.player1Choice;
+        p2Choice.text = FirebaseController.player2Choice;
+
+        
+    }
+
+    public void Win(string player1Result, string player2Result)
+    {
+        switch (player1Result)
+        {
+            case "Rock":
+                switch (player2Result)
+                {
+                    case "Rock":
+                        break;
+                    case "Paper":
+                        FirebaseController.player2.Wins++;
+                        break;
+                    case "Scissors":
+                        FirebaseController.player1.Wins++;
+                        break;
+                    case "None":
+                        FirebaseController.player1.Wins++;
+                        break;
+                }
+                break;
+            case "Paper":
+                switch (player2Result)
+                {
+                    case "Rock":
+                        FirebaseController.player1.Wins++;
+                        break;
+                    case "Paper":
+                        break;
+                    case "Scissors":
+                        FirebaseController.player2.Wins++;
+                        break;
+                    case "None":
+                        FirebaseController.player1.Wins++;
+                        break;
+                }
+                break;
+            case "Scissors":
+                switch (player2Result)
+                {
+                    case "Rock":
+                        FirebaseController.player2.Wins++;
+                        break;
+                    case "Paper":
+                        FirebaseController.player1.Wins++;
+                        break;
+                    case "Scissors":
+                        break;
+                    case "None":
+                        FirebaseController.player1.Wins++;
+                        break;
+                }
+                break;
+            case "None":
+                if (player2Result != "None")
+                {
+                    FirebaseController.player2.Wins++;
+                }
+                break;
+        }
+
+        //FirebaseController.player1Choice = "";
+        //FirebaseController.player2Choice = "";
+
+        Debug.Log("P1 Score:" + FirebaseController.player1.Wins);
+        Debug.Log("P2 Score:" + FirebaseController.player2.Wins);
     }
 }

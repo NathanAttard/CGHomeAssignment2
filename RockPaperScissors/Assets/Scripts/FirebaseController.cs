@@ -42,6 +42,7 @@ public class FirebaseController : MonoBehaviour
 
         player1.Name = p1Name;
         player1.ID = 1;
+        player1.Wins = 0;
         string p1Json = JsonUtility.ToJson(player1);
 
         yield return databaseReference.Child("Games").Child(key).Child("Player_1").SetRawJsonValueAsync(p1Json);
@@ -127,6 +128,7 @@ public class FirebaseController : MonoBehaviour
     public static IEnumerator AddSecondPlayerFB(string key)
     {
         player2.ID = 2;
+        player2.Wins = 0;
         string p2Json = JsonUtility.ToJson(player2);
 
         yield return databaseReference.Child("Games").Child(key).Child("Player_2").SetRawJsonValueAsync(p2Json);
