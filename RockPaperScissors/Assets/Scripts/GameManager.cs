@@ -32,9 +32,15 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject paperBtn;
     [SerializeField] private GameObject scissorsBtn;
 
+    [Header("Winner")]
+    [SerializeField] private TMP_Text winner;
+
     Coroutine roundTimer;
     float roundTime = 0.10f;
     float currentTime;
+
+    int rounds = 5;
+    int currentRound = 1;
     
     private void Awake()
     {
@@ -53,9 +59,12 @@ public class GameManager : MonoBehaviour
             case "Game":
                 player1Name.text = FirebaseController.player1.Name;
                 player2Name.text = FirebaseController.player2.Name;
-                p1Win.text = FirebaseController.player1.Wins.ToString();
-                p2Win.text = FirebaseController.player2.Wins.ToString();
+                p1Win.text = FirebaseController.player1.Wins;
+                p2Win.text = FirebaseController.player2.Wins;
                 waitingForChoice.SetActive(false);
+                break;
+            case "Winner":
+                winner.text = FirebaseController.winner;
                 break;
             default:
                 break;
@@ -65,8 +74,12 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        currentTime = roundTime;
-        roundTimer = StartCoroutine(RoundTime());
+        if (SceneManager.GetActiveScene().name == "Game")
+        {
+            currentTime = roundTime;
+            roundTimer = StartCoroutine(RoundTime());
+        }
+
     }
 
     // Update is called once per frame
@@ -278,7 +291,6 @@ public class GameManager : MonoBehaviour
 
         p1Choice.text = FirebaseController.player1Choice;
         p2Choice.text = FirebaseController.player2Choice;
-
         
     }
 
@@ -292,13 +304,13 @@ public class GameManager : MonoBehaviour
                     case "Rock":
                         break;
                     case "Paper":
-                        FirebaseController.player2.Wins++;
+                        FirebaseController.player2Wins++;
                         break;
                     case "Scissors":
-                        FirebaseController.player1.Wins++;
+                        FirebaseController.player1Wins++;
                         break;
                     case "None":
-                        FirebaseController.player1.Wins++;
+                        FirebaseController.player1Wins++;
                         break;
                 }
                 break;
@@ -306,15 +318,15 @@ public class GameManager : MonoBehaviour
                 switch (player2Result)
                 {
                     case "Rock":
-                        FirebaseController.player1.Wins++;
+                        FirebaseController.player1Wins++;
                         break;
                     case "Paper":
                         break;
                     case "Scissors":
-                        FirebaseController.player2.Wins++;
+                        FirebaseController.player2Wins++;
                         break;
                     case "None":
-                        FirebaseController.player1.Wins++;
+                        FirebaseController.player1Wins++;
                         break;
                 }
                 break;
@@ -322,30 +334,95 @@ public class GameManager : MonoBehaviour
                 switch (player2Result)
                 {
                     case "Rock":
-                        FirebaseController.player2.Wins++;
+                        FirebaseController.player2Wins++;
                         break;
                     case "Paper":
-                        FirebaseController.player1.Wins++;
+                        FirebaseController.player1Wins++;
                         break;
                     case "Scissors":
                         break;
                     case "None":
-                        FirebaseController.player1.Wins++;
+                        FirebaseController.player1Wins++;
                         break;
                 }
                 break;
             case "None":
                 if (player2Result != "None")
                 {
-                    FirebaseController.player2.Wins++;
+                    FirebaseController.player2Wins++;
                 }
                 break;
         }
 
-        //FirebaseController.player1Choice = "";
-        //FirebaseController.player2Choice = "";
+        FirebaseController.UpdatePlayerWinsFB(FirebaseController.player1, FirebaseController.player1Wins);
+        FirebaseController.UpdatePlayerWinsFB(FirebaseController.player2, FirebaseController.player2Wins);
+
+        p1Win.text = FirebaseController.player1Wins.ToString();
+        p2Win.text = FirebaseController.player2Wins.ToString();
+
+        FirebaseController.player1Choice = "";
+        FirebaseController.player2Choice = "";
 
         Debug.Log("P1 Score:" + FirebaseController.player1.Wins);
         Debug.Log("P2 Score:" + FirebaseController.player2.Wins);
+
+        NextRound();
+    }
+
+    public void NextRound()
+    {
+        Debug.Log("NEXT ROUND");
+
+        if (currentRound <= rounds)
+        {
+            List<GameObject> buttons = new List<GameObject>();
+            buttons.Add(rockBtn);
+            buttons.Add(paperBtn);
+            buttons.Add(scissorsBtn);
+
+            foreach (GameObject button in buttons)
+            {
+                button.GetComponent<Button>().interactable = true;
+                button.GetComponent<Button>().enabled = true;
+            }
+
+            FirebaseController.player1Choice = "";
+            FirebaseController.player2Choice = "";
+
+            currentRound++;
+        }
+        else if (currentRound >= rounds)
+        {
+            if ((FirebaseController.player1Wins > FirebaseController.player2Wins) || (FirebaseController.player1Wins < FirebaseController.player2Wins))
+            {
+                if (FirebaseController.player1Wins > FirebaseController.player2Wins)
+                {
+                    FirebaseController.winner = FirebaseController.player1.Name;
+                }
+                else
+                {
+                    FirebaseController.winner = FirebaseController.player2.Name;
+                }
+            }
+            else
+            {
+                FirebaseController.winner = "Tie";
+            }
+        }
+        
+    }
+
+    public void Surrender()
+    {
+        if (FirebaseController.isPlayer1 == true)
+        {
+            FirebaseController.winner = FirebaseController.player2.Name;
+        }
+        else if (FirebaseController.isPlayer2 == true)
+        {
+            FirebaseController.winner = FirebaseController.player1.Name;
+        }
+
+        LoadScene("Winner");
     }
 }

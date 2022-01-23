@@ -18,7 +18,15 @@ public class FirebaseController : MonoBehaviour
     public static bool player2Ready = false;
 
     public static string player1Choice = "";    
-    public static string player2Choice = "";    
+    public static string player2Choice = "";
+
+    public static int player1Wins = 0;
+    public static int player2Wins = 0;
+
+    static string p1WinsString;
+    static string p2WinsString;
+
+    public static string winner = "";
 
     private static DatabaseReference databaseReference;
 
@@ -33,7 +41,8 @@ public class FirebaseController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        p1WinsString = player1Wins.ToString();
+        p2WinsString = player2Wins.ToString();
     }
 
     public static IEnumerator CreateGameFB(string p1Name)
@@ -42,7 +51,7 @@ public class FirebaseController : MonoBehaviour
 
         player1.Name = p1Name;
         player1.ID = 1;
-        player1.Wins = 0;
+        player1.Wins = "0";
         string p1Json = JsonUtility.ToJson(player1);
 
         yield return databaseReference.Child("Games").Child(key).Child("Player_1").SetRawJsonValueAsync(p1Json);
@@ -128,7 +137,7 @@ public class FirebaseController : MonoBehaviour
     public static IEnumerator AddSecondPlayerFB(string key)
     {
         player2.ID = 2;
-        player2.Wins = 0;
+        player2.Wins = "0";
         string p2Json = JsonUtility.ToJson(player2);
 
         yield return databaseReference.Child("Games").Child(key).Child("Player_2").SetRawJsonValueAsync(p2Json);
@@ -245,7 +254,52 @@ public class FirebaseController : MonoBehaviour
 
     public static void CheckChoices()
     {
-        Debug.Log("Player 1 Choice " + FirebaseController.player1Choice);
-        Debug.Log("Player 2 Choice " + FirebaseController.player2Choice);
+        Debug.Log("Player 1 Choice " + player1Choice);
+        Debug.Log("Player 2 Choice " + player2Choice);
+    }
+
+    public static void UpdatePlayerWinsFB(Player player, int playerWins)
+    {
+        Debug.Log("Updating Player Wins");
+
+        Dictionary<string, System.Object> result = new Dictionary<string, System.Object>();
+
+        result["Games/" + key + "/Player_" + player.ID + "/Wins"] = playerWins;
+
+        databaseReference.UpdateChildrenAsync(result);
+        databaseReference.Child("Games").Child(key).ValueChanged += HandleWinsChanged;
+
+        Debug.Log("Player Wins Updated");
+    }
+
+    public static void HandleWinsChanged(object sender, ValueChangedEventArgs args)
+    {
+        if (args.DatabaseError != null)
+        {
+            Debug.LogError(args.DatabaseError.Message);
+            return;
+        }
+        else
+        {
+            Debug.Log("Wins Changed");
+            Dictionary<string, System.Object> result = new Dictionary<string, System.Object>();
+
+            foreach (var player in args.Snapshot.Children)
+            {
+                switch (player.Key)
+                {
+                    case "Player_1":
+                        p1WinsString = player.Child("Wins").Value.ToString();
+                        break;
+                    case "Player_2":
+                        p2WinsString = player.Child("Wins").Value.ToString();
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            Debug.Log("Wins Updated");
+        }
     }
 }

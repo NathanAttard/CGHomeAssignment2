@@ -8,6 +8,6 @@ public class Player : MonoBehaviour
     public int ID;
     public string Choice;
     public int Moves;
-    public int Wins;
+    public string Wins;
     public bool IsReady;
 }
