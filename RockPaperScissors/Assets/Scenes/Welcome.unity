@@ -553,10 +553,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24c34860e813f3847bc8d3a99583aad7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerName: {fileID: 841268532}
   gameCode: {fileID: 0}
   enterGameCode: {fileID: 0}
+  playerName: {fileID: 841268532}
   p1Name: {fileID: 0}
+  p2Name: {fileID: 0}
+  waitingForOpponent: {fileID: 0}
+  player1Name: {fileID: 0}
+  player2Name: {fileID: 0}
+  timer: {fileID: 0}
+  waitingForChoice: {fileID: 0}
+  p1Choice: {fileID: 0}
+  p2Choice: {fileID: 0}
+  p1Win: {fileID: 0}
+  p2Win: {fileID: 0}
+  rockBtn: {fileID: 0}
+  paperBtn: {fileID: 0}
+  scissorsBtn: {fileID: 0}
+  winner: {fileID: 0}
 --- !u!4 &523949202
 Transform:
   m_ObjectHideFlags: 0
@@ -1240,6 +1254,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1224763636}
   - component: {fileID: 1224763637}
+  - component: {fileID: 1224763638}
   m_Layer: 0
   m_Name: Firebase
   m_TagString: Untagged
@@ -1273,7 +1288,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3267765f1ae4f524ea52c0c38564496a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isKeyCorrect: 0
+--- !u!114 &1224763638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1224763635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f6cc13e978e3884c9f08d9eb50d6a0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1408532426
 GameObject:
   m_ObjectHideFlags: 0
