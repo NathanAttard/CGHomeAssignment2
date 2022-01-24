@@ -39,6 +39,9 @@ public class GameManager : MonoBehaviour
     float roundTime = 0.10f;
     float currentTime;
 
+    Coroutine matchTimer;
+    float matchTime = 0.0f;
+
     int rounds = 5;
     int currentRound = 1;
     
@@ -78,6 +81,7 @@ public class GameManager : MonoBehaviour
         {
             currentTime = roundTime;
             roundTimer = StartCoroutine(RoundTime());
+            matchTimer = StartCoroutine(MatchTime());
         }
 
     }
@@ -199,6 +203,17 @@ public class GameManager : MonoBehaviour
             string time = currentTime.ToString("00.00").Replace('.', ':');
 
             timer.text = time;
+
+            yield return new WaitForSeconds(1f);
+        }
+    }
+
+    public IEnumerator MatchTime()
+    {
+        while (true)
+        {
+            matchTime = matchTime + 0.01f;
+            matchTime = (float)Mathf.Round(currentTime * 100f) / 100f;
 
             yield return new WaitForSeconds(1f);
         }
@@ -408,6 +423,8 @@ public class GameManager : MonoBehaviour
             {
                 FirebaseController.winner = "Tie";
             }
+
+            Winner();
         }
         
     }
@@ -422,6 +439,14 @@ public class GameManager : MonoBehaviour
         {
             FirebaseController.winner = FirebaseController.player1.Name;
         }
+
+        Winner();
+    }
+
+    public void Winner()
+    {
+        StopCoroutine(matchTimer);
+        FirebaseController.matchTime = matchTime.ToString("00.00").Replace('.', ':');
 
         LoadScene("Winner");
     }

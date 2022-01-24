@@ -27,6 +27,7 @@ public class FirebaseController : MonoBehaviour
     static string p2WinsString;
 
     public static string winner = "";
+    public static string matchTime = "";
 
     private static DatabaseReference databaseReference;
 
